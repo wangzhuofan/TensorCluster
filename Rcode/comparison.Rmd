@@ -1,0 +1,49 @@
+---
+title: "comparison"
+author: "zhuofan"
+date: '2022-07-05'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## data generation
+```{r}
+
+
+
+```
+
+## evluation
+```{r}
+
+
+```
+
+## BMWC 
+```{r}
+
+
+
+```
+
+## Hloyd
+```{r}
+
+
+```
+
+## MatrixForm
+```{r}
+
+
+
+```
+
+
+## MultiCluster
+```{r}
+
+
+```

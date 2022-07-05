@@ -1,0 +1,26 @@
+---
+title: "GTEx-brain"
+author: "zhuofan"
+date: '2022-07-05'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## read data
+```{r}
+
+```
+
+## application
+```{r}
+
+```
+
+## comparison
+```{r}
+
+
+```
