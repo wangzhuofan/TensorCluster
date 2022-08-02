@@ -398,7 +398,7 @@ set.seed(1)
   c1track <- list()
   c2track <- list()
   c3track <- list()
-  al=1;bl=3;av=1;bv=5;am=5;bm=1;sigmal=1;mub=-2
+  al=1;bl=3;av=1;bv=20;am=5;bm=1;sigmal=1;mub=-2
   ;sigmab=1;arho=1;brho=1;psi_1=5;psi0=20;psi1=5;as=1;bs=1;sigmamu=1;
  
   #//dimension
@@ -497,7 +497,7 @@ ob = foreach(i=1:10,.combine=rbind,.packages=c("simFrame","progress","testarma",
     c3 <- data[[5]]
     bayes_multi(y,c1,c2,c3)
   }
-ob1 = foreach(i=1:5,.packages=c("simFrame","progress","testarma","gtools")) %dopar% 
+ob2 = foreach(i=6:10,.packages=c("simFrame","progress","testarma","gtools")) %dopar% 
   {
     data <- generatedata_overlap(i)
     y <- data[[1]]
