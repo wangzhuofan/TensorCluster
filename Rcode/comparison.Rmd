@@ -398,8 +398,8 @@ set.seed(1)
   c1track <- list()
   c2track <- list()
   c3track <- list()
-  al=1;bl=3;av=1;bv=10;am=5;bm=1;sigmal=1;mub=-2
-  ;sigmab=1;arho=1;brho=1;psi_1=2;psi0=6;psi1=2;as=1;bs=1;sigmamu=1;
+  al=1;bl=3;av=1;bv=10;am=10;bm=1;sigmal=1;mub=-2
+  ;sigmab=1;arho=1;brho=1;psi_1=3;psi0=10;psi1=3;as=1;bs=1;sigmamu=1;
  
   #//dimension
   d=dim(y);
@@ -497,7 +497,7 @@ ob = foreach(i=1:10,.combine=rbind,.packages=c("simFrame","progress","testarma",
     c3 <- data[[5]]
     bayes_multi(y,c1,c2,c3)
   }
-ob2 = foreach(i=6:10,.packages=c("simFrame","progress","testarma","gtools")) %dopar% 
+ob2= foreach(i=6:10,.packages=c("simFrame","progress","testarma","gtools")) %dopar% 
   {
     data <- generatedata_overlap(i)
     y <- data[[1]]
@@ -550,7 +550,15 @@ result = foreach(i=1:10,.combine=rbind,.packages=c("progress","testarma","gtools
       c2na <- ob2[[i-5]][[2]]
       c3na <- ob2[[i-5]][[3]]
     }
-    if(ncol(c1na)<3){
+    if(ncol(c1na)==1){
+      c1na <- cbind(c1na,rep(0,15))
+      c1na <- cbind(c1na,rep(0,15))
+      c2na <- cbind(c2na,rep(0,200))
+      c2na <- cbind(c2na,rep(0,200))
+      c3na <- cbind(c3na,rep(0,15))
+      c3na <- cbind(c3na,rep(0,15))
+    }
+    if(ncol(c1na)==2){
       c1na <- cbind(c1na,rep(0,15))
       c2na <- cbind(c2na,rep(0,200))
       c3na <- cbind(c3na,rep(0,15))
