@@ -398,8 +398,8 @@ set.seed(1)
   c1track <- list()
   c2track <- list()
   c3track <- list()
-  al=1;bl=3;av=1;bv=10;am=10;bm=1;sigmal=1;mub=-2
-  ;sigmab=1;arho=1;brho=1;psi_1=3;psi0=10;psi1=3;as=1;bs=1;sigmamu=1;
+  al=1;bl=3;av=1;bv=10;am=0.5;bm=0.5;sigmal=1;mub=-2
+  ;sigmab=1;arho=1;brho=1;psi_1=1;psi0=8;psi1=1;as=1;bs=1;sigmamu=1;
  
   #//dimension
   d=dim(y);
@@ -497,7 +497,7 @@ ob = foreach(i=1:10,.combine=rbind,.packages=c("simFrame","progress","testarma",
     c3 <- data[[5]]
     bayes_multi(y,c1,c2,c3)
   }
-ob2= foreach(i=6:10,.packages=c("simFrame","progress","testarma","gtools")) %dopar% 
+ob2= foreach(i=1:10,.packages=c("simFrame","progress","testarma","gtools")) %dopar% 
   {
     data <- generatedata_overlap(i)
     y <- data[[1]]
@@ -532,7 +532,7 @@ result = foreach(i=1:10,.combine=rbind,.packages=c("progress","testarma","gtools
     c(min_ham(c1,c1b),min_ham(c2,c2b),min_ham(c3,c3b))
   }
 
-result = foreach(i=1:10,.combine=rbind,.packages=c("progress","testarma","gtools")) %dopar% 
+result = foreach(i=1:10,.combine=rbind,.packages=c("progress","testarma","gtools")) %dopar%
   {
     data <- generatedata_overlap(i)
     #y <- data[[1]]
@@ -570,6 +570,45 @@ result = foreach(i=1:10,.combine=rbind,.packages=c("progress","testarma","gtools
     }
     c(min_ham(c1,c1na),min_ham(c2,c2na),min_ham(c3,c3na))
   }
+result = foreach(i=1:10,.combine=rbind,.packages=c("progress","testarma","gtools")) %dopar%
+  {
+    data <- generatedata_overlap(i)
+    #y <- data[[1]]
+    #yna <- data[[2]]
+    c1 <- data[[3]]
+    c2 <- data[[4]]
+    c3 <- data[[5]]
+    #if(i<=5){
+      c1na <- ob2[[i]][[1]]
+      c2na <- ob2[[i]][[2]]
+      c3na <- ob2[[i]][[3]]
+    #}
+    #else{
+      #c1na <- ob2[[i-5]][[1]]
+      #c2na <- ob2[[i-5]][[2]]
+      #c3na <- ob2[[i-5]][[3]]
+    #}
+    if(ncol(c1na)==1){
+      c1na <- cbind(c1na,rep(0,15))
+      c1na <- cbind(c1na,rep(0,15))
+      c2na <- cbind(c2na,rep(0,200))
+      c2na <- cbind(c2na,rep(0,200))
+      c3na <- cbind(c3na,rep(0,15))
+      c3na <- cbind(c3na,rep(0,15))
+    }
+    if(ncol(c1na)==2){
+      c1na <- cbind(c1na,rep(0,15))
+      c2na <- cbind(c2na,rep(0,200))
+      c3na <- cbind(c3na,rep(0,15))
+    }
+    if(ncol(c1na)>3){
+      c1 <- cbind(c1,rep(0,15))
+      c2 <- cbind(c2,rep(0,200))
+      c3 <- cbind(c3,rep(0,15))
+    }
+    c(min_ham(c1,c1na),min_ham(c2,c2na),min_ham(c3,c3na))
+  }
+result <- result[-9,]
 mean(result[,1]/15)
 sd(result[,1]/15)
 mean(result[,2]/200)
