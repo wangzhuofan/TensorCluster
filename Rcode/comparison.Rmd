@@ -398,8 +398,8 @@ set.seed(1)
   c1track <- list()
   c2track <- list()
   c3track <- list()
-  al=1;bl=3;av=0.5;bv=2;am=10;bm=2;sigmal=1;mub=-2
-  ;sigmab=1;arho=1;brho=1;psi_1=1;psi0=5;psi1=1;as=1;bs=1;sigmamu=1;
+  al=1;bl=3;av=1;bv=10;am=5;bm=1;sigmal=1;mub=-2
+  ;sigmab=1;arho=1;brho=1;psi_1=1;psi0=8;psi1=1;as=1;bs=1;sigmamu=1;
  
   #//dimension
   d=dim(y);
@@ -498,7 +498,7 @@ ob = foreach(i=1:10,.combine=rbind,.packages=c("simFrame","progress","testarma",
     c3 <- data[[5]]
     bayes_multi(y,c1,c2,c3)
   }
-ob2= foreach(i=1:10,.packages=c("simFrame","progress","testarma","gtools")) %dopar% 
+ob2= foreach(i=11:50,.packages=c("simFrame","progress","testarma","gtools")) %dopar% 
   {
     data <- generatedata_overlap(i)
     y <- data[[1]]
@@ -508,7 +508,7 @@ ob2= foreach(i=1:10,.packages=c("simFrame","progress","testarma","gtools")) %dop
     c3 <- data[[5]]
     bayes_multi_n(y,c1,c2,c3)
   }
- nob = foreach(i=1:10,.packages=c("progress","testarma","gtools")) %dopar% 
+ nob = foreach(i=1:50,.packages=c("progress","testarma","gtools")) %dopar% 
   {
     data <- generate_nonoverlap(i)
     y <- data[[1]]
@@ -571,18 +571,18 @@ result = foreach(i=1:10,.combine=rbind,.packages=c("progress","testarma","gtools
     }
     c(min_ham(c1,c1na),min_ham(c2,c2na),min_ham(c3,c3na))
   }
-result = foreach(i=1:10,.combine=rbind,.packages=c("progress","testarma","gtools")) %dopar%
+resultob = foreach(i=1:50,.combine=rbind,.packages=c("progress","testarma","gtools")) %dopar%
   {
-    data <- generatedata_overlap(i)
+    data <- generate_nonoverlap(i)
     #y <- data[[1]]
     #yna <- data[[2]]
-    c1 <- data[[3]]
-    c2 <- data[[4]]
-    c3 <- data[[5]]
+    c1 <- data[[2]]
+    c2 <- data[[3]]
+    c3 <- data[[4]]
     #if(i<=5){
-      c1na <- ob2[[i]][[1]]
-      c2na <- ob2[[i]][[2]]
-      c3na <- ob2[[i]][[3]]
+      c1na <- nob[[i]][[1]]
+      c2na <- nob[[i]][[2]]
+      c3na <- nob[[i]][[3]]
     #}
     #else{
       #c1na <- ob2[[i-5]][[1]]
@@ -616,12 +616,26 @@ mean(result[,2]/200)
 sd(result[,2]/200)
 mean(result[,3]/15)
 sd(result[,3]/15)
+
+mean(result[,1])
+sd(result[,1])
+mean(result[,2])
+sd(result[,2])
+mean(result[,3])
+sd(result[,3])
+
+mean(resultob[,1]/15)
+sd(resultob[,1]/15)
+mean(resultob[,2]/200)
+sd(resultob[,2]/200)
+mean(resultob[,3]/15)
+sd(resultob[,3]/15)
 ```
 
 ## Hloyd
 
 ```{r}
-oh = foreach(i=1:10,.combine=rbind,.packages=c("HLloyd","simFrame","progress","reshape2")) %dopar% 
+oh = foreach(i=1:50,.combine=rbind,.packages=c("HLloyd","simFrame","progress","reshape2")) %dopar% 
   {
     {data <- generatedata_overlap(i)
     y <- data[[1]]
@@ -648,8 +662,14 @@ oh = foreach(i=1:10,.combine=rbind,.packages=c("HLloyd","simFrame","progress","r
     c3h[which(is.na(c3h))] <- 0 
     c(min_ham(c1h,c1),min_ham(c2h,c2),min_ham(c3h,c3))
   }
+mean(oh[,1]/15)
+sd(oh[,1]/15)
+mean(oh[,2]/200)
+sd(oh[,2]/200)
+mean(oh[,3]/15)
+sd(oh[,3]/15)
 
-noh = foreach(i=1:10,.combine=rbind,.packages=c("HLloyd","testarma","simFrame","progress","reshape2")) %dopar% 
+noh = foreach(i=1:50,.combine=rbind,.packages=c("HLloyd","testarma","simFrame","progress","reshape2")) %dopar% 
   {
     data <- generate_nonoverlap(i)
     y <- data[[1]]
@@ -676,7 +696,12 @@ noh = foreach(i=1:10,.combine=rbind,.packages=c("HLloyd","testarma","simFrame","
     c3h[which(is.na(c3h))] <- 0 
     c(min_ham(c1h,c1),min_ham(c2h,c2),min_ham(c3h,(c3!=0)))
   }
-
+mean(noh[,1]/15)
+sd(noh[,1]/15)
+mean(noh[,2]/200)
+sd(noh[,2]/200)
+mean(noh[,3]/15)
+sd(noh[,3]/15)
 ```
 
 ## MatrixForm
@@ -766,7 +791,7 @@ c3_ham <- min_ham(C, c3)
 return(c(c1_ham,c3_ham))
 }
 
-om = foreach(i=1:10,.combine=rbind,.packages=c("simFrame","progress","MatrixForm","gtools","truncnorm")) %dopar% 
+om = foreach(i=1:50,.combine=rbind,.packages=c("simFrame","progress","MatrixForm","gtools","truncnorm")) %dopar% 
   {
     data <- generatedata_overlap(i)
     y <- data[[1]]
@@ -777,7 +802,11 @@ om = foreach(i=1:10,.combine=rbind,.packages=c("simFrame","progress","MatrixForm
     c3 <- data[[5]]
     mf(y_matrix,c1,c3)
   }
-nom = foreach(i=1:10,.combine=rbind,.packages=c("progress","MatrixForm","gtools","truncnorm")) %dopar% 
+mean(om[,1]/15)
+sd(om[,1]/15)
+mean(om[,2]/15)
+sd(om[,2]/15)
+nom = foreach(i=1:50,.combine=rbind,.packages=c("progress","MatrixForm","gtools","truncnorm")) %dopar% 
   {
     data <- generate_nonoverlap(i)
     y <- data[[1]]
@@ -788,28 +817,32 @@ nom = foreach(i=1:10,.combine=rbind,.packages=c("progress","MatrixForm","gtools"
     c3 <- data[[4]]
     mf(y_matrix,c1,c3)
   }
-
+mean(nom[,1]/15)
+sd(nom[,1]/15)
+mean(nom[,2]/15)
+sd(nom[,2]/15)
 
 ```
 
 ## MultiCluster
 
 ```{r}
-y1 <- matrix(0,nrow = 15*15*200,ncol = 10)
-y2 <- matrix(0,nrow = 15*15*200,ncol = 10)
-for (la in 1:10) {
+repli <- 50
+y1 <- matrix(0,nrow = 15*15*200,ncol = repli)
+y2 <- matrix(0,nrow = 15*15*200,ncol = repli)
+for (la in 1:repli) {
   data <- generatedata_overlap(la)
   y1[,la] <- as.vector(data[[1]])
   data <- generate_nonoverlap(la)
   y2[,la] <- as.vector(data[[1]])
 }
-cy <- matrix(0,nrow = 15,ncol = 10)
-cyy <- matrix(0,nrow = 15,ncol = 10)
-cz <- matrix(0,nrow = 15,ncol = 10)
-czz <- matrix(0,nrow = 15,ncol = 10)
-cx <- matrix(0,nrow = 200,ncol = 10)
-cxx <- matrix(0,nrow = 200,ncol = 10)
-for (la in 1:10) {
+cy <- matrix(0,nrow = 15,ncol = repli)
+cyy <- matrix(0,nrow = 15,ncol = repli)
+cz <- matrix(0,nrow = 15,ncol = repli)
+czz <- matrix(0,nrow = 15,ncol = repli)
+cx <- matrix(0,nrow = 200,ncol = repli)
+cxx <- matrix(0,nrow = 200,ncol = repli)
+for (la in 1:repli) {
   cz[,la] <- read.csv(paste("z",la,".csv",sep = ""),header = FALSE)$V1
   czz[,la] <- read.csv(paste("zn",la,".csv",sep = ""),header = FALSE)$V1
   cy[,la] <- read.csv(paste("y",la,".csv",sep = ""),header = FALSE)$V1
@@ -817,9 +850,9 @@ for (la in 1:10) {
   cx[,la] <- read.csv(paste("x",la,".csv",sep = ""),header = FALSE)$V1
   cxx[,la] <- read.csv(paste("xn",la,".csv",sep = ""),header = FALSE)$V1
 }
-recordo <- matrix(0,10,3)
-recordn <- matrix(0,10,3)
-for (la in 1:10) {
+recordo <- matrix(0,repli,3)
+recordn <- matrix(0,repli,3)
+for (la in 1:repli) {
   data <- generatedata_overlap(la)
   c1 <- data[[3]]
   c2 <- data[[4]]
@@ -837,6 +870,20 @@ for (la in 1:10) {
   mm3 <- tomembershipmatrix(list(cyy[,la]))[[1]]
   recordn[la,] <- c(min_ham(mm1,c2),min_ham(mm2,c1),min_ham(mm3,c3!=0))
 }
+
+mean(recordo[,1]/200)
+sd(recordo[,1]/200)
+mean(recordo[,2]/15)
+sd(recordo[,2]/15)
+mean(recordo[,3]/15)
+sd(recordo[,3]/15)
+
+mean(recordn[,1]/200)
+sd(recordn[,1]/200)
+mean(recordn[,2]/15)
+sd(recordn[,2]/15)
+mean(recordn[,3]/15)
+sd(recordn[,3]/15)
 ```
 
 ## BMWCNA
@@ -848,8 +895,8 @@ set.seed(1)
   c1track <- list()
   c2track <- list()
   c3track <- list()
-  al=1;bl=3;av=1;bv=10;am=1;bm=1;sigmal=1;mub=-2
-  ;sigmab=1;arho=1;brho=1;psi_1=5;psi0=20;psi1=5;as=1;bs=1;sigmamu=1;
+  al=1;bl=3;av=1;bv=10;am=5;bm=1;sigmal=1;mub=-2
+  ;sigmab=1;arho=1;brho=1;psi_1=1;psi0=8;psi1=1;as=1;bs=1;sigmamu=1;
  
   #//dimension
   d=dim(y);
@@ -940,7 +987,7 @@ return(list(c1p,c2p,c3p))
 set.seed(3)
 d <- c(15,200,15)
 nac <- sample(1:(d[1]*d[2]),0.5*d[1]*d[2])
-obna1 = foreach(i=6:10,.packages=c("simFrame","progress","BMWCNA","gtools")) %dopar% 
+obna1 = foreach(i=1:50,.packages=c("simFrame","progress","BMWCNA","gtools")) %dopar% 
   {
     data <- generatedata_na(i,nac)
     #y <- data[[1]]
@@ -950,27 +997,39 @@ obna1 = foreach(i=6:10,.packages=c("simFrame","progress","BMWCNA","gtools")) %do
     c3 <- data[[5]]
     bayes_multi_na(yna,c1,c2,c3)
   }
- c1_avna <- matrix(0,15,3)
+
+obna_del <- obna1[-26]
+c1_avna <- matrix(0,15,3)
 c2_avna <- matrix(0,200,3)
 c3_avna <- matrix(0,15,3)
-for (i in 1:10){
+for (i in 1:50){
     data <- generatedata_na(i,nac)
     #y <- data[[1]]
     #yna <- data[[2]]
     c1 <- data[[3]]
     c2 <- data[[4]]
     c3 <- data[[5]]
-    if(i<=5){
-      c1na <- obna[[i]][[1]]
-      c2na <- obna[[i]][[2]]
-      c3na <- obna[[i]][[3]]
+    #if(i<=5){
+     # c1na <- obna[[i]][[1]]
+    #  c2na <- obna[[i]][[2]]
+     # c3na <- obna[[i]][[3]]
+    #}
+    #else{
+    if(i!=26){
+      c1na <- obna1[[i]][[1]]
+      c2na <- obna1[[i]][[2]]
+      c3na <- obna1[[i]][[3]]
     }
-    else{
-      c1na <- obna1[[i-5]][[1]]
-      c2na <- obna1[[i-5]][[2]]
-      c3na <- obna1[[i-5]][[3]]
+   # }
+    if(ncol(c1na)==1){
+      c1na <- cbind(c1na,rep(0,15))
+      c1na <- cbind(c1na,rep(0,15))
+      c2na <- cbind(c2na,rep(0,200))
+      c2na <- cbind(c2na,rep(0,200))
+      c3na <- cbind(c3na,rep(0,15))
+      c3na <- cbind(c3na,rep(0,15))
     }
-    if(ncol(c1na)<3){
+    if(ncol(c1na)==2){
       c1na <- cbind(c1na,rep(0,15))
       c2na <- cbind(c2na,rep(0,200))
       c3na <- cbind(c3na,rep(0,15))
@@ -988,9 +1047,12 @@ for (i in 1:10){
     c2_avna = c2_avna+c2na
     c3_avna = c3_avna+c3na
 }
-c1_avna <- c1_avna/10
-c2_avna <- c2_avna/10
-c3_avna <- c3_avna/10
+c1_avna <- c1_avna/50
+c2_avna <- c2_avna/50
+c3_avna <- c3_avna/50
+
+kcl = unlist(lapply(obna1, function(x){ncol(x[[1]])}))
+hist(kcl)
 ```
 ## BMWC_update
 ```{r}
