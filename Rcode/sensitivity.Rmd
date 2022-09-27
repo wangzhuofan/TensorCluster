@@ -475,7 +475,7 @@ result = foreach(i=1:10,.combine=rbind,.packages=c("progress","testarma","gtools
     }
     c(min_ham(c1,c1na),min_ham(c2,c2na),min_ham(c3,c3na))
   }
-senres = foreach(i=11:30,.combine=rbind,.packages=c("progress","testarma","gtools")) %dopar%
+senres = foreach(i=1:30,.combine=rbind,.packages=c("progress","testarma","gtools")) %dopar%
   {
     data <- generatedata_overlap(i)
     #y <- data[[1]]
@@ -484,9 +484,9 @@ senres = foreach(i=11:30,.combine=rbind,.packages=c("progress","testarma","gtool
     c2 <- data[[4]]
     c3 <- data[[5]]
     #if(i<=5){
-      c1na <- sen[[i-10]][[1]]
-      c2na <- sen[[i-10]][[2]]
-      c3na <- sen[[i-10]][[3]]
+      c1na <- sen[[i]][[1]]
+      c2na <- sen[[i]][[2]]
+      c3na <- sen[[i]][[3]]
     #}
     #else{
       #c1na <- ob2[[i-5]][[1]]

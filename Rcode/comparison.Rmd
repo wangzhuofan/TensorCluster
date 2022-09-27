@@ -398,7 +398,7 @@ set.seed(1)
   c1track <- list()
   c2track <- list()
   c3track <- list()
-  al=1;bl=3;av=1;bv=10;am=5;bm=1;sigmal=1;mub=-1
+  al=0.5;bl=2;av=1;bv=10;am=5;bm=1;sigmal=1;mub=-1
   ;sigmab=5;arho=1;brho=1;psi_1=1;psi0=8;psi1=1;as=1;bs=1;sigmamu=10;
  
   #//dimension
@@ -498,7 +498,7 @@ ob = foreach(i=1:10,.combine=rbind,.packages=c("simFrame","progress","testarma",
     c3 <- data[[5]]
     bayes_multi(y,c1,c2,c3)
   }
-ob2= foreach(i=1:50,.packages=c("simFrame","progress","testarma","gtools")) %dopar% 
+ob2= foreach(i=1:20,.packages=c("simFrame","progress","testarma","gtools")) %dopar% 
   {
     data <- generatedata_overlap(i)
     y <- data[[1]]
@@ -508,7 +508,7 @@ ob2= foreach(i=1:50,.packages=c("simFrame","progress","testarma","gtools")) %dop
     c3 <- data[[5]]
     bayes_multi_n(y,c1,c2,c3)
   }
- nob = foreach(i=1:50,.packages=c("progress","testarma","gtools")) %dopar% 
+      nob = foreach(i=1:50,.packages=c("progress","testarma","gtools")) %dopar% 
   {
     data <- generate_nonoverlap(i)
     y <- data[[1]]
@@ -533,7 +533,7 @@ result = foreach(i=1:10,.combine=rbind,.packages=c("progress","testarma","gtools
     c(min_ham(c1,c1b),min_ham(c2,c2b),min_ham(c3,c3b))
   }
 
-result = foreach(i=1:10,.combine=rbind,.packages=c("progress","testarma","gtools")) %dopar%
+result = foreach(i=1:20,.combine=rbind,.packages=c("progress","testarma","gtools")) %dopar%
   {
     data <- generatedata_overlap(i)
     #y <- data[[1]]
@@ -541,16 +541,16 @@ result = foreach(i=1:10,.combine=rbind,.packages=c("progress","testarma","gtools
     c1 <- data[[3]]
     c2 <- data[[4]]
     c3 <- data[[5]]
-    if(i<=5){
-      c1na <- ob1[[i]][[1]]
-      c2na <- ob1[[i]][[2]]
-      c3na <- ob1[[i]][[3]]
-    }
-    else{
-      c1na <- ob2[[i-5]][[1]]
-      c2na <- ob2[[i-5]][[2]]
-      c3na <- ob2[[i-5]][[3]]
-    }
+    #if(i<=5){
+     # c1na <- ob1[[i]][[1]]
+      #c2na <- ob1[[i]][[2]]
+      #c3na <- ob1[[i]][[3]]
+    #}
+    #else{
+      c1na <- ob2[[i]][[1]]
+      c2na <- ob2[[i]][[2]]
+      c3na <- ob2[[i]][[3]]
+    #}
     if(ncol(c1na)==1){
       c1na <- cbind(c1na,rep(0,15))
       c1na <- cbind(c1na,rep(0,15))
@@ -571,7 +571,7 @@ result = foreach(i=1:10,.combine=rbind,.packages=c("progress","testarma","gtools
     }
     c(min_ham(c1,c1na),min_ham(c2,c2na),min_ham(c3,c3na))
   }
-resultob = foreach(i=1:40,.combine=rbind,.packages=c("progress","testarma","gtools")) %dopar%
+resultnob = foreach(i=1:50,.combine=rbind,.packages=c("progress","testarma","gtools")) %dopar%
   {
     data <- generate_nonoverlap(i)
     #y <- data[[1]]
@@ -580,9 +580,9 @@ resultob = foreach(i=1:40,.combine=rbind,.packages=c("progress","testarma","gtoo
     c2 <- data[[3]]
     c3 <- data[[4]]
     #if(i<=5){
-      c1na <- ob2[[i]][[1]]
-      c2na <- ob2[[i]][[2]]
-      c3na <- ob2[[i]][[3]]
+      c1na <- nob[[i]][[1]]
+      c2na <- nob[[i]][[2]]
+      c3na <- nob[[i]][[3]]
     #}
     #else{
       #c1na <- ob2[[i-5]][[1]]
@@ -611,11 +611,11 @@ resultob = foreach(i=1:40,.combine=rbind,.packages=c("progress","testarma","gtoo
   }
 result <- result[-9,]
 mean(result[,1]/15)
-sd(result[,1]/15)
+sd(result[,1]/15)/sqrt(20)
 mean(result[,2]/200)
-sd(result[,2]/200)
+sd(result[,2]/200)/sqrt(20)
 mean(result[,3]/15)
-sd(result[,3]/15)
+sd(result[,3]/15)/sqrt(20)
 
 mean(result[,1])
 sd(result[,1])
@@ -624,12 +624,12 @@ sd(result[,2])
 mean(result[,3])
 sd(result[,3])
 
-mean(resultob[,1]/15)
-sd(resultob[,1]/15)
-mean(resultob[,2]/200)
-sd(resultob[,2]/200)
-mean(resultob[,3]/15)
-sd(resultob[,3]/15)
+mean(resultnob[,1]/15)
+sd(resultnob[,1]/15)/sqrt(50)
+mean(resultnob[,2]/200)
+sd(resultnob[,2]/200)/sqrt(50)
+mean(resultnob[,3]/15)
+sd(resultnob[,3]/15)/sqrt(50)
 ```
 
 ## Hloyd
@@ -788,10 +788,11 @@ if(ncol(A)<3){
 c1_ham <- min_ham(A, c1)
 #c2_ham3[repli] <- min_ham(c2, c2_ol)
 c3_ham <- min_ham(C, c3) 
-return(c(c1_ham,c3_ham))
+#return(c(c1_ham,c3_ham))
+return(list("A"=A,"C"=C))
 }
 
-om = foreach(i=1:50,.combine=rbind,.packages=c("simFrame","progress","MatrixForm","gtools","truncnorm")) %dopar% 
+om = foreach(i=1:50,.packages=c("simFrame","progress","MatrixForm","gtools","truncnorm")) %dopar% 
   {
     data <- generatedata_overlap(i)
     y <- data[[1]]
@@ -806,7 +807,7 @@ mean(om[,1]/15)
 sd(om[,1]/15)
 mean(om[,2]/15)
 sd(om[,2]/15)
-nom = foreach(i=1:50,.combine=rbind,.packages=c("progress","MatrixForm","gtools","truncnorm")) %dopar% 
+nom = foreach(i=1:50,.packages=c("progress","MatrixForm","gtools","truncnorm")) %dopar% 
   {
     data <- generate_nonoverlap(i)
     y <- data[[1]]

@@ -11,7 +11,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## read data
 ```{r}
-
+tis_set <- read.csv("/Users/wangzhuofan/Project/MultiWay/MultiWay/data/tis_set.csv")
+tis_set <- tis_set$x
+dep_gene <- read.csv("/Users/wangzhuofan/Project/MultiWay/MultiWay/data/depression_name.csv")
+dep_gene <- dep_gene$x
+depression <- read.csv("/Users/wangzhuofan/Project/MultiWay/MultiWay/data/tensor_depression.csv")
+depression <- depression$x
+y_dep <- array(depression,dim = c(193,13,15))
+rm(depression)
 ```
 
 ## application
@@ -20,7 +27,115 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## comparison
+### BMWC
 ```{r}
 
 
+```
+
+### HLloyd
+```{r}
+library(HLloyd)
+library(reshape2)
+library(ggplot2)
+y_tensor <- as.tensor(y_dep)
+r <- 6
+## tensor method
+set.seed(1)
+z.HOSC = HO.SC(y_tensor, r) # high-order initialization
+z.Lloyd.HOSC = HO.Lloyd(y_tensor, z.HOSC) # HLloyd iteration
+c1_ind <- data.frame("object"=1:193,"class"=z.Lloyd.HOSC[[1]],"value"=rep(1,193))
+c2_ind <- data.frame("object"=1:13,"class"=z.Lloyd.HOSC[[2]],"value"=rep(1,13))
+c3_ind <- data.frame("object"=1:15,"class"=z.Lloyd.HOSC[[3]],"value"=rep(1,15))
+c1h <- acast(c1_ind,object~class)
+c1h[which(is.na(c1h))] <- 0
+c2h <- acast(c2_ind,object~class)
+c2h[which(is.na(c2h))] <- 0
+c3h <- acast(c3_ind,object~class)
+c3h[which(is.na(c3h))] <- 0 
+rownames(c2h) <- tis_set
+rownames(c3h) <- dep_gene
+pc1p = melt(t(c1h), varnames = c("Factor", "firstorder"), value.name = "Indicator")
+pc2p = melt(t(c2h), varnames = c("Factor", "secondorder"), value.name = "Indicator")
+pc3p = melt(t(c3h), varnames = c("Factor", "thirdorder"), value.name = "Indicator")
+#ggplot2::ggplot(pc2o, aes(x = secondorder, y = Factor)) + geom_tile(aes(fill = Indicator), color = "black") +
+# scale_fill_gradient(low = "black", high = "green") + theme(legend.position = "none") +
+#scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) + labs(x = "", y = "")
+ggplot2::ggplot(pc1p, aes(y =firstorder, x = Factor)) + geom_tile(aes(fill = Indicator), color = "black") +
+  scale_fill_gradient(low = "black", high = "green") + theme(legend.position = "none") +
+  scale_x_discrete(expand = c(0, 0),guide = guide_axis(n.dodge=5)) + scale_y_discrete(expand = c(0, 0)) + labs(x = "", y = "")
+ggplot2::ggplot(pc2p, aes(y = secondorder, x = Factor)) + geom_tile(aes(fill = Indicator), color = "black") +
+  scale_fill_gradient(low = "black", high = "green") + theme(legend.position = "none",axis.text.x = element_text(size = 5, angle = 45)) +
+  scale_x_discrete(expand = c(0, 0),guide = guide_axis(n.dodge=10)) + scale_y_discrete(expand = c(0, 0)) + labs(x = "", y = "")
+ggplot2::ggplot(pc3p, aes(y = thirdorder, x = Factor)) + geom_tile(aes(fill = Indicator), color = "black") +
+  scale_fill_gradient(low = "black", high = "green") + theme(legend.position = "none",axis.text.x = element_text(size = 5, angle = 45)) +
+  scale_x_discrete(expand = c(0, 0),guide = guide_axis(n.dodge=10)) + scale_y_discrete(expand = c(0, 0)) + labs(x = "", y = "")
+################################################################################
+```
+### MultiCluster
+```{r}
+rx <- read.csv("/Users/wangzhuofan/Project/TensorCluster/results/real_mc/rx.csv",header = FALSE)
+ry <- read.csv("/Users/wangzhuofan/Project/TensorCluster/results/real_mc/ry.csv",header = FALSE)
+rz <- read.csv("/Users/wangzhuofan/Project/TensorCluster/results/real_mc/rz.csv",header = FALSE)
+rz <- abs(rz[,1:6])
+kmx <- read.csv("/Users/wangzhuofan/Project/TensorCluster/results/real_mc/kmx.csv",header = FALSE)
+kmy <- read.csv("/Users/wangzhuofan/Project/TensorCluster/results/real_mc/kmy.csv",header = FALSE)
+kmz <- read.csv("/Users/wangzhuofan/Project/TensorCluster/results/real_mc/kmz.csv",header = FALSE)
+rz$tissue <- tis_set
+ry$gene <- dep_gene
+rx$donor <- 1:193
+```
+```{r}
+
+p1 <- ggplot(rz,aes(y=reorder(tissue,V1),x=V1))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()
+p2 <- ggplot(rz,aes(y=reorder(tissue,V2),x=V2))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()
+p3 <- ggplot(rz,aes(y=reorder(tissue,V3),x=V3))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()
+p4 <- ggplot(rz,aes(y=reorder(tissue,V4),x=V4))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()
+p5 <- ggplot(rz,aes(y=reorder(tissue,V5),x=V5))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()
+p6 <- ggplot(rz,aes(y=reorder(tissue,V6),x=V6))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()
+
+p7 <- ggplot(ry,aes(y=reorder(gene,V1),x=V1))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()+theme(axis.ticks = element_blank(), axis.text.y = element_blank())
+p8 <- ggplot(ry,aes(y=reorder(gene,V2),x=V2))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()+theme(axis.ticks = element_blank(), axis.text.y = element_blank())
+p9 <- ggplot(ry,aes(y=reorder(gene,V3),x=V3))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()+theme(axis.ticks = element_blank(), axis.text.y = element_blank())
+p10 <- ggplot(ry,aes(y=reorder(gene,V4),x=V4))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()+theme(axis.ticks = element_blank(), axis.text.y = element_blank())
+p11 <- ggplot(ry,aes(y=reorder(gene,V5),x=V5))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()+theme(axis.ticks = element_blank(), axis.text.y = element_blank())
+p12 <- ggplot(ry,aes(y=reorder(gene,V6),x=V6))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()+theme(axis.ticks = element_blank(), axis.text.y = element_blank())
+
+p13 <- ggplot(rx,aes(y=reorder(donor,V1),x=V1))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()+theme(axis.ticks = element_blank(), axis.text.y = element_blank())
+p14 <- ggplot(rx,aes(y=reorder(donor,V2),x=V2))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()+theme(axis.ticks = element_blank(), axis.text.y = element_blank())
+p15 <- ggplot(rx,aes(y=reorder(donor,V3),x=V3))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()+theme(axis.ticks = element_blank(), axis.text.y = element_blank())
+p16 <- ggplot(rx,aes(y=reorder(donor,V4),x=V4))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()+theme(axis.ticks = element_blank(), axis.text.y = element_blank())
+p17 <- ggplot(rx,aes(y=reorder(donor,V5),x=V5))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()+theme(axis.ticks = element_blank(), axis.text.y = element_blank())
+p18 <- ggplot(rx,aes(y=reorder(donor,V6),x=V6))+geom_bar(stat = "identity")+xlab(NULL)+ylab(NULL)+theme_classic()+theme(axis.ticks = element_blank(), axis.text.y = element_blank())
+ggarrange(p1,p7,p13,p2,p8,p14,p3,p9,p15,p4,p10,p16,p5,p11,p17,p6,p12,p18,ncol =3,nrow = 6)
+```
+
+```{r}
+kmx <- read.csv("/Users/wangzhuofan/Project/TensorCluster/results/real_mc/kmx.csv",header = FALSE)
+kmy <- read.csv("/Users/wangzhuofan/Project/TensorCluster/results/real_mc/kmy.csv",header = FALSE)
+kmz <- read.csv("/Users/wangzhuofan/Project/TensorCluster/results/real_mc/kmz.csv",header = FALSE)
+km <- tomembershipmatrix(list((kmx$V1),as.vector(kmy$V1),as.vector(kmz$V1)))
+c1mc <- km[[1]]
+c2mc <- km[[2]]
+c3mc <- km[[3]]
+```
+
+```{r}
+rownames(c2mc) <- dep_gene
+rownames(c3mc) <- tis_set
+pc1p = melt(t(c1mc), varnames = c("Factor", "firstorder"), value.name = "Indicator")
+pc2p = melt(t(c2mc), varnames = c("Factor", "secondorder"), value.name = "Indicator")
+pc3p = melt(t(c3mc), varnames = c("Factor", "thirdorder"), value.name = "Indicator")
+#ggplot2::ggplot(pc2o, aes(x = secondorder, y = Factor)) + geom_tile(aes(fill = Indicator), color = "black") +
+# scale_fill_gradient(low = "black", high = "green") + theme(legend.position = "none") +
+#scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) + labs(x = "", y = "")
+ggplot2::ggplot(pc1p, aes(y =firstorder, x = Factor)) + geom_tile(aes(fill = Indicator), color = "black") +
+  scale_fill_gradient(low = "black", high = "green") + theme(legend.position = "none") +
+  scale_x_discrete(expand = c(0, 0),guide = guide_axis(n.dodge=5)) + scale_y_discrete(expand = c(0, 0)) + labs(x = "", y = "")
+ggplot2::ggplot(pc2p, aes(y = secondorder, x = Factor)) + geom_tile(aes(fill = Indicator), color = "black") +
+  scale_fill_gradient(low = "black", high = "green") + theme(legend.position = "none",axis.text.x = element_text(size = 5, angle = 45)) +
+  scale_x_discrete(expand = c(0, 0),guide = guide_axis(n.dodge=10)) + scale_y_discrete(expand = c(0, 0)) + labs(x = "", y = "")
+ggplot2::ggplot(pc3p, aes(y = thirdorder, x = Factor)) + geom_tile(aes(fill = Indicator), color = "black") +
+  scale_fill_gradient(low = "black", high = "green") + theme(legend.position = "none",axis.text.x = element_text(size = 5, angle = 45)) +
+  scale_x_discrete(expand = c(0, 0),guide = guide_axis(n.dodge=10)) + scale_y_discrete(expand = c(0, 0)) + labs(x = "", y = "")
 ```
